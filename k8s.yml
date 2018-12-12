@@ -1,0 +1,44 @@
+---
+
+- name: Build certificate authority
+  hosts: k8s_ca
+  roles:
+    - role: githubixx.cfssl
+      tags: role-cfssl
+    - role: githubixx.kubernetes-ca
+      tags: role-kubernetes-ca
+
+- name: Install kubectl
+  hosts: k8s_kubectl
+  roles:
+    - role: githubixx.kubectl
+      tags: role-kubectl
+
+- name: Prepare all nodes
+  hosts: k8s:children
+  roles:
+    # set user to deploy afterwards
+    #- role: githubixx.harden-linux
+    #  tags: role-harden-linux
+    - role: githubixx.kubernetes-flanneld
+      tags: role-kubernetes-flanneld
+    - role: githubixx.docker
+      tags: role-docker
+
+- name: Install etcd
+  hosts: k8s_etcd
+  roles:
+    - role: githubixx.etcd
+      tags: role-etcd
+
+- name: Initialize Kubernetes cluster
+  hosts: k8s_controller
+  roles:
+    - role: githubixx.kubernetes-controller
+      tags: role-kubernetes-controller
+
+- name: Join workers to cluster
+  hosts: k8s_worker
+  roles:
+    - role: githubixx.kubernetes-worker
+      tags: role-kubernetes-worker

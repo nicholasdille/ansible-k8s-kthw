@@ -1,0 +1,46 @@
+---
+
+- name: githubixx.cfssl
+  src: https://github.com/githubixx/ansible-role-cfssl.git
+  scm: git
+  version: v2.0.3_r1.2.0
+
+- name: githubixx.kubernetes-ca
+  src: https://github.com/githubixx/ansible-role-kubernetes-ca.git
+  scm: git
+  version: r6.0.0_v1.10.4
+
+- name: githubixx.kubectl
+  src: https://github.com/githubixx/ansible-role-kubectl.git
+  scm: git
+  version: r6.0.1_v1.13.0
+
+- name: githubixx.harden-linux
+  src: https://github.com/githubixx/ansible-role-harden-linux.git
+  scm: git
+  version: v3.0.1
+
+- name: githubixx.kubernetes-flanneld
+  src: https://github.com/githubixx/ansible-role-flanneld.git
+  scm: git
+  version: v6.0.2_r0.10.0
+
+- name: githubixx.docker
+  src: https://github.com/githubixx/ansible-role-docker.git
+  scm: git
+  version: r3.1.0_v17.03.2-ce
+
+- name: githubixx.etcd
+  src: https://github.com/githubixx/ansible-role-etcd.git
+  scm: git
+  version: r6.0.1_v3.2.24
+
+- name: githubixx.kubernetes-controller
+  src: https://github.com/githubixx/ansible-role-kubernetes-controller.git
+  scm: git
+  version: r5.0.1_v1.12.3
+
+- name: githubixx.kubernetes-worker
+  src: https://github.com/githubixx/ansible-role-kubernetes-worker.git
+  scm: git
+  version: r7.0.1_v1.12.3

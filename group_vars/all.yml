@@ -1,0 +1,13 @@
+---
+
+# create random password: date +%s | sha256sum | base64 | head -c 32
+# encrypt password for /etc/shadow: python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
+
+harden_linux_root_password: $1$SomeSalt$lWqujLM0aUUI/KfVtnwbS/
+harden_linux_deploy_user: deploy
+harden_linux_deploy_user_password: $1$SomeSalt$CfDdyUOJVJNUzWQEJ8uXl.
+harden_linux_deploy_user_home: /home/deploy
+harden_linux_deploy_user_public_keys:
+  - /home/deploy/.ssh/id_rsa.pub
+
+kubectl_version: "1.13.0"
