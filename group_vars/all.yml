@@ -10,4 +10,13 @@ harden_linux_deploy_user_home: /home/deploy
 harden_linux_deploy_user_public_keys:
   - /home/deploy/.ssh/id_rsa.pub
 
+k8s_interface: eth0
+
+#k8s_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+k8s_ca_certificate_owner: "dillen"
+k8s_ca_certificate_group: "dillen"
+
+etcd_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+etcd_interface: "eth0"
+
 kubectl_version: "1.13.0"

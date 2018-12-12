@@ -1,5 +1,10 @@
 ---
 
+- name: Gathering
+  hosts: all
+  tasks:
+    - debug: var=inventory_hostname
+
 - name: Build certificate authority
   hosts: k8s_ca
   roles:
@@ -14,6 +19,12 @@
     - role: githubixx.kubectl
       tags: role-kubectl
 
+- name: Install etcd
+  hosts: k8s_etcd
+  roles:
+    - role: githubixx.etcd
+      tags: role-etcd
+
 - name: Prepare all nodes
   hosts: k8s:children
   roles:
@@ -24,12 +35,6 @@
       tags: role-kubernetes-flanneld
     - role: githubixx.docker
       tags: role-docker
-
-- name: Install etcd
-  hosts: k8s_etcd
-  roles:
-    - role: githubixx.etcd
-      tags: role-etcd
 
 - name: Initialize Kubernetes cluster
   hosts: k8s_controller
