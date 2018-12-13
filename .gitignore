@@ -1,3 +1,4 @@
 roles/**
+playbooks/**
 tmp/**
-certs/**
+k8s/**

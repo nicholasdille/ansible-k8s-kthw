@@ -1,17 +1,19 @@
 ---
 
-- name: Gathering
-  hosts: all
-  tasks:
-    - debug: var=inventory_hostname
+#- import_playbook: prepare.yml
+#- import_playbook: ca.yml
 
-- name: Build certificate authority
-  hosts: k8s_ca
-  roles:
-    - role: githubixx.cfssl
-      tags: role-cfssl
-    - role: githubixx.kubernetes-ca
-      tags: role-kubernetes-ca
+- name: Gather facts
+  hosts: k8s
+  tasks:
+    - setup:
+
+- import_playbook: playbooks/kubeauthconfig/kubelets.yml
+- import_playbook: playbooks/kubeauthconfig/kube-proxy.yml
+- import_playbook: playbooks/kubeauthconfig/kube-controller-manager.yml
+- import_playbook: playbooks/kubeauthconfig/kube-scheduler.yml
+- import_playbook: playbooks/kubeauthconfig/kube-admin-user.yml
+- import_playbook: playbooks/kubeencryptionconfig/kubeencryptionconfig.yml
 
 - name: Install kubectl
   hosts: k8s_kubectl
@@ -28,19 +30,19 @@
 - name: Prepare all nodes
   hosts: k8s:children
   roles:
-    # set user to deploy afterwards
-    #- role: githubixx.harden-linux
-    #  tags: role-harden-linux
     - role: githubixx.kubernetes-flanneld
       tags: role-kubernetes-flanneld
     - role: githubixx.docker
       tags: role-docker
-
+      
 - name: Initialize Kubernetes cluster
   hosts: k8s_controller
   roles:
     - role: githubixx.kubernetes-controller
       tags: role-kubernetes-controller
+  tasks:
+    - name: STOP
+      command: "false"
 
 - name: Join workers to cluster
   hosts: k8s_worker

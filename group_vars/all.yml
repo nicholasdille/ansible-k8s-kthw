@@ -3,20 +3,40 @@
 # create random password: date +%s | sha256sum | base64 | head -c 32
 # encrypt password for /etc/shadow: python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
 
+
+# Hardening
 harden_linux_root_password: $1$SomeSalt$lWqujLM0aUUI/KfVtnwbS/
 harden_linux_deploy_user: deploy
 harden_linux_deploy_user_password: $1$SomeSalt$CfDdyUOJVJNUzWQEJ8uXl.
 harden_linux_deploy_user_home: /home/deploy
 harden_linux_deploy_user_public_keys:
-  - /home/deploy/.ssh/id_rsa.pub
+  - ~/id_rsa_hetzner.pub
 
-k8s_interface: eth0
-
-#k8s_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+# CA
+cfssl_bin_directory: "~/.local/bin"
+#k8s_ca_conf_directory: "~/k8s/certs | expanduser"
 k8s_ca_certificate_owner: "dillen"
 k8s_ca_certificate_group: "dillen"
+k8s_interface: eth0
 
-etcd_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+# Config
+k8s_encryption_config_directory: "{{k8s_config_directory}}"
+k8s_encryption_config_key: "M2RmYTJjNDY1ODY0ZTU0YmZiYzdjYzUx"
+
+# Global
+k8s_config_cluster_name: "hcloudcluster"
+k8s_apiserver_secure_port: 6443
+kubectl_version: "1.13.0"
+k8s_release: "1.13.0"
+
+# kubectl
+kubectl_bin_directory: "~/.local/bin"
+kubectl_owner: dillen
+kubectl_group: dillen
+
+# etcd
+#etcd_ca_conf_directory: "/home/dillen/ansible-k8s/k8s/certs"
 etcd_interface: "eth0"
 
-kubectl_version: "1.13.0"
+# control plane
+#k8s_config_directory: "/home/dillen/ansible-k8s/k8s/configs"

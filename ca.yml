@@ -1,0 +1,14 @@
+---
+
+- name: Gather facts about all nodes
+  hosts: all
+  tasks:
+    - setup:
+
+- name: Build certificate authority
+  hosts: k8s_ca
+  roles:
+    - role: githubixx.cfssl
+      tags: role-cfssl
+    - role: githubixx.kubernetes-ca
+      tags: role-kubernetes-ca
