@@ -3,23 +3,23 @@
 #- import_playbook: prepare.yml
 #- import_playbook: ca.yml
 
-- name: Gather facts
-  hosts: k8s
-  tasks:
-    - setup:
+#- name: Gather facts
+#  hosts: k8s
+#  tasks:
+#    - setup:
 
-- import_playbook: playbooks/kubeauthconfig/kubelets.yml
-- import_playbook: playbooks/kubeauthconfig/kube-proxy.yml
-- import_playbook: playbooks/kubeauthconfig/kube-controller-manager.yml
-- import_playbook: playbooks/kubeauthconfig/kube-scheduler.yml
-- import_playbook: playbooks/kubeauthconfig/kube-admin-user.yml
-- import_playbook: playbooks/kubeencryptionconfig/kubeencryptionconfig.yml
+#- import_playbook: playbooks/kubeauthconfig/kubelets.yml
+#- import_playbook: playbooks/kubeauthconfig/kube-proxy.yml
+#- import_playbook: playbooks/kubeauthconfig/kube-controller-manager.yml
+#- import_playbook: playbooks/kubeauthconfig/kube-scheduler.yml
+#- import_playbook: playbooks/kubeauthconfig/kube-admin-user.yml
+#- import_playbook: playbooks/kubeencryptionconfig/kubeencryptionconfig.yml
 
-- name: Install kubectl
-  hosts: k8s_kubectl
-  roles:
-    - role: githubixx.kubectl
-      tags: role-kubectl
+#- name: Install kubectl
+#  hosts: k8s_kubectl
+#  roles:
+#    - role: githubixx.kubectl
+#      tags: role-kubectl
 
 - name: Install etcd
   hosts: k8s_etcd
@@ -40,6 +40,9 @@
   roles:
     - role: githubixx.kubernetes-controller
       tags: role-kubernetes-controller
+
+- name: STOP
+  hosts: workstation
   tasks:
     - name: STOP
       command: "false"

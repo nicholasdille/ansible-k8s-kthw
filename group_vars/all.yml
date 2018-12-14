@@ -6,18 +6,18 @@
 
 # Hardening
 harden_linux_root_password: $1$SomeSalt$lWqujLM0aUUI/KfVtnwbS/
-harden_linux_deploy_user: deploy
+harden_linux_deploy_user: rdadm
 harden_linux_deploy_user_password: $1$SomeSalt$CfDdyUOJVJNUzWQEJ8uXl.
-harden_linux_deploy_user_home: /home/deploy
+harden_linux_deploy_user_home: /home/rdadm
 harden_linux_deploy_user_public_keys:
-  - ~/id_rsa_hetzner.pub
+  - ~/id_rsa_rdadm.pub
 
 # CA
 cfssl_bin_directory: "~/.local/bin"
-#k8s_ca_conf_directory: "~/k8s/certs | expanduser"
-k8s_ca_certificate_owner: "dillen"
-k8s_ca_certificate_group: "dillen"
-k8s_interface: eth0
+k8s_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+k8s_ca_certificate_owner: "rdadm"
+k8s_ca_certificate_group: "rdadm"
+k8s_interface: "ens160"
 
 # Config
 k8s_encryption_config_directory: "{{k8s_config_directory}}"
@@ -31,12 +31,16 @@ k8s_release: "1.13.0"
 
 # kubectl
 kubectl_bin_directory: "~/.local/bin"
-kubectl_owner: dillen
-kubectl_group: dillen
+kubectl_owner: rdadm
+kubectl_group: rdadm
 
 # etcd
-#etcd_ca_conf_directory: "/home/dillen/ansible-k8s/k8s/certs"
-etcd_interface: "eth0"
+etcd_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
+etcd_interface: "ens160"
 
 # control plane
-#k8s_config_directory: "/home/dillen/ansible-k8s/k8s/configs"
+k8s_config_directory: "{{ '~/k8s/configs' | expanduser }}"
+k8s_controller_manager_settings_user:
+  "address": "0.0.0.0"
+k8s_scheduler_settings_user:
+  "address": "0.0.0.0"

@@ -7,10 +7,10 @@
     - name: Install python
       raw: "apt-get update && apt-get -y install python-pip"
 
-- name: Harden
-  vars:
-    ansible_user: root
-  hosts: k8s
-  roles:
-    - role: githubixx.harden-linux
-      tags: role-harden-linux
+      #- name: Harden
+      #  vars:
+      #    ansible_user: root
+      #  hosts: k8s
+      #  roles:
+      #    - role: githubixx.harden-linux
+      #      tags: role-harden-linux
