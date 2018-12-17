@@ -1,0 +1,104 @@
+---
+
+- name: Provision virtual machines
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: Provision controllers
+      hcloud_server:
+        name:
+          - controller01
+          - controller02
+          - controller03
+        image: ubuntu-16.04
+        server_type: cx21
+        location: fsn1
+        ssh_keys:
+          - 209622
+        token: "{{ hcloud.token }}"
+      register: controllers
+
+    - name: Create inventory in memory
+      add_host:
+        name: "{{ item.name }}"
+        ansible_host: "{{ item.public_ipv4 }}"
+        ansible_user: root
+        ansible_ssh_private_key_file: "~/id_rsa_hetzner"
+        groups:
+          - k8s_etcd
+          - k8s_controller
+      with_items: "{{ controllers.servers }}"
+
+    - name: Provision workers
+      hcloud_server:
+        name:
+          - worker01
+          - worker02
+        image: ubuntu-16.04
+        server_type: cx21
+        location: fsn1
+        ssh_keys:
+          - 209622
+        token: "{{ hcloud.token }}"
+      register: controllers
+
+    - name: Create inventory
+      add_host:
+        name: "{{ item.name }}"
+        ansible_host: "{{ item.public_ipv4 }}"
+        ansible_user: root
+        ansible_ssh_private_key_file: "~/id_rsa_hetzner"
+        groups:
+          - k8s_worker
+      with_items: "{{ controllers.servers }}"
+
+- name: Store connection information
+  hosts: k8s_controller k8s_worker
+  gather_facts: no
+  tasks:
+
+    - name: Create inventory on disk
+      copy:
+        content: |
+          ---
+
+          ansible_host: "{{ ansible_host }}"
+          ansible_user: "{{ ansible_user }}"
+          ansible_ssh_private_key_file: "{{ ansible_ssh_private_key_file }}"
+        dest: "host_vars/{{ inventory_hostname }}"
+      delegate_to: localhost
+
+    - name: Create SSH config
+      copy:
+        content: |
+          # config for {{ inventory_hostname }}
+          Host {{ inventory_hostname }}
+              HostName {{ ansible_host }}
+              User {{ ansible_user }}
+              IdentityFile {{ ansible_ssh_private_key_file }}
+              StrictHostKeyChecking no
+              UserKnownHostsFile /dev/null
+        dest: "~/.ssh/config.d/hcloud_{{ inventory_hostname }}"
+        mode: "0640"
+      delegate_to: localhost
+
+    - name: Wait for SSH
+      wait_for:
+        host: "{{ ansible_host }}"
+        port: 22
+        connect_timeout: 5
+        timeout: 15
+      delegate_to: localhost
+
+    - name: Print configuration
+      debug:
+        var: hostvars[inventory_hostname]
+        verbosity: 1
+
+    - name: Install updates
+      raw: "apt-get update && apt-get -y upgrade"
+
+    - name: Install Python
+      raw: "apt-get -y install python-pip"

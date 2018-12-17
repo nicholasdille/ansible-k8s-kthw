@@ -1,5 +1,12 @@
 ---
 
+cloudflare:
+  email: "{{ vault_cloudflare_email }}"
+  token: "{{ vault_cloudflare_token }}"
+
+hcloud:
+  token: "{{vault_hcloud_token }}"
+
 # create random password: date +%s | sha256sum | base64 | head -c 32
 # encrypt password for /etc/shadow: python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
 

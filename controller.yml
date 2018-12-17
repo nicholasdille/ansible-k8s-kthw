@@ -1,0 +1,23 @@
+---
+
+#- name: Install kubectl
+#  hosts: k8s_kubectl
+#  roles:
+#    - role: githubixx.kubectl
+#      tags: role-kubectl
+
+- name: Install etcd
+  hosts: k8s_etcd
+  roles:
+    - role: githubixx.etcd
+      tags: role-etcd
+
+- name: Initialize Kubernetes cluster
+  hosts: k8s_controller
+  roles:
+    - role: githubixx.kubernetes-flanneld
+      tags: role-kubernetes-flanneld
+    - role: githubixx.docker
+      tags: role-docker
+    - role: githubixx.kubernetes-controller
+      tags: role-kubernetes-controller

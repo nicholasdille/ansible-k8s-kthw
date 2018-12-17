@@ -1,0 +1,11 @@
+---
+
+- name: Join workers to cluster
+  hosts: k8s_worker
+  roles:
+    - role: githubixx.kubernetes-flanneld
+      tags: role-kubernetes-flanneld
+    - role: githubixx.docker
+      tags: role-docker
+    - role: githubixx.kubernetes-worker
+      tags: role-kubernetes-worker

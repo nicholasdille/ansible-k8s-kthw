@@ -5,13 +5,13 @@ workstation
 workstation
 
 [k8s_etcd]
-controller0[1:3]
+controller[01:03]
 
 [k8s_controller]
-controller0[1:3]
+controller[01:03]
 
 [k8s_worker]
-#worker0[1:2]
+worker[01:02]
 
 [k8s:children]
 k8s_controller
