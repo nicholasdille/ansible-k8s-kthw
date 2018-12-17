@@ -3,6 +3,8 @@
 # create random password: date +%s | sha256sum | base64 | head -c 32
 # encrypt password for /etc/shadow: python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
 
+local_user: dillen
+interface_name: eth0
 
 # Hardening
 harden_linux_root_password: $1$SomeSalt$lWqujLM0aUUI/KfVtnwbS/
@@ -15,9 +17,9 @@ harden_linux_deploy_user_public_keys:
 # CA
 cfssl_bin_directory: "~/.local/bin"
 k8s_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
-k8s_ca_certificate_owner: "rdadm"
-k8s_ca_certificate_group: "rdadm"
-k8s_interface: "ens160"
+k8s_ca_certificate_owner: "{{ local_user }}"
+k8s_ca_certificate_group: "{{ local_user }}"
+k8s_interface: "{{ interface_name }}"
 
 # Config
 k8s_encryption_config_directory: "{{k8s_config_directory}}"
@@ -31,12 +33,12 @@ k8s_release: "1.13.0"
 
 # kubectl
 kubectl_bin_directory: "~/.local/bin"
-kubectl_owner: rdadm
-kubectl_group: rdadm
+kubectl_owner: "{{ local_user }}"
+kubectl_group: "{{ local_user }}"
 
 # etcd
 etcd_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
-etcd_interface: "ens160"
+etcd_interface: "{{ interface_name }}"
 
 # control plane
 k8s_config_directory: "{{ '~/k8s/configs' | expanduser }}"
