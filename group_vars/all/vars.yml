@@ -46,10 +46,162 @@ kubectl_group: "{{ local_user }}"
 # etcd
 etcd_ca_conf_directory: "{{ '~/k8s/certs' | expanduser }}"
 etcd_interface: "{{ interface_name }}"
+etcd_bin_dir: "/usr/local/bin"
+etcd_client_port: "2379"
 
 # control plane
+k8s_conf_dir: "/var/lib/kubernetes"
 k8s_config_directory: "{{ '~/k8s/configs' | expanduser }}"
 k8s_controller_manager_settings_user:
   "address": "0.0.0.0"
 k8s_scheduler_settings_user:
   "address": "0.0.0.0"
+
+# Traefik
+traefik_clusterrole: |
+  ---
+  kind: ClusterRole
+  apiVersion: rbac.authorization.k8s.io/v1
+  metadata:
+    name: traefik-ingress-controller
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - services
+        - endpoints
+        - secrets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - extensions
+      resources:
+        - ingresses
+      verbs:
+        - get
+        - list
+        - watch
+
+traefik_clusterrolebinding: |
+  ---
+  kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1
+  metadata:
+    name: traefik-ingress-controller
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: traefik-ingress-controller
+  subjects:
+  - kind: ServiceAccount
+    name: traefik-ingress-controller
+    namespace: kube-system
+
+traefik_serviceaccount: |
+  ---
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: traefik-ingress-controller
+    namespace: kube-system
+
+traefik_daemonset: |
+  ---
+  kind: DaemonSet
+  apiVersion: apps/v1
+  metadata:
+    name: traefik-ingress-controller
+    namespace: kube-system
+    labels:
+      k8s-app: traefik-ingress-lb
+  spec:
+    selector:
+      matchLabels:
+        k8s-app: traefik-ingress-lb
+    updateStrategy:
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          k8s-app: traefik-ingress-lb
+          name: traefik-ingress-lb
+      spec:
+        serviceAccountName: traefik-ingress-controller
+        terminationGracePeriodSeconds: 60
+        hostNetwork: true
+        dnsPolicy: ClusterFirstWithHostNet
+        containers:
+        - image: traefik:v1.7-alpine
+          name: traefik-ingress-lb
+          imagePullPolicy: IfNotPresent
+          #livenessProbe:
+          #  failureThreshold: 2
+          #  httpGet:
+          #    path: /ping
+          #    port: 8080
+          #    scheme: HTTP
+          #  initialDelaySeconds: 10
+          #  periodSeconds: 5
+          #readinessProbe:
+          #  failureThreshold: 2
+          #  httpGet:
+          #    path: /ping
+          #    port: 8080
+          #    scheme: HTTP
+          #  periodSeconds: 5
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "64Mi"
+              cpu: "250m"
+          ports:
+          - name: http
+            containerPort: 80
+            hostPort: 80
+          - name: https
+            containerPort: 443
+            hostPort: 443
+          - name: ping
+            containerPort: 8080
+          securityContext:
+            privileged: true
+          volumeMounts:
+          - name: tls
+            mountPath: {{k8s_conf_dir}}
+            readOnly: true
+          args:
+          - --checknewversion=false
+          - --loglevel=INFO
+          - --defaultentrypoints=http,https
+          - --entrypoints=Name:http Address::80 Redirect.EntryPoint:https
+          - --entrypoints=Name:https Address::443 TLS
+          - --entrypoints=Name:ping Address::8080
+          - --etcd=true
+          - --etcd.prefix=/traefik
+          - --etcd.watch=true
+          - --etcd.endpoint={{groups.k8s_etcd|first}}:2379
+          - --etcd.tls=true
+          - --etcd.tls.ca={{k8s_conf_dir}}/ca-etcd.pem
+          - --etcd.tls.cert={{k8s_conf_dir}}/cert-etcd.pem
+          - --etcd.tls.key={{k8s_conf_dir}}/cert-etcd-key.pem
+          - --etcd.useapiv3=true
+          - --kubernetes=true
+          - --kubernetes.watch=true
+          - --ping.entrypoint=ping
+          - --acme=true
+          - --acme.acmelogging=true
+          - --acme.caserver=https://acme-staging.api.letsencrypt.org/directory
+          - --acme.entrypoint=https
+          - --acme.httpchallenge=true
+          - --acme.httpChallenge.entryPoint=http
+          - --acme.email=nicholas.dille@mailbox.org
+          - --acme.onhostrule
+          - --acme.storage=/traefik/acme/account
+        volumes:
+          - name: tls
+            secret:
+              secretName: traefik-etcd
