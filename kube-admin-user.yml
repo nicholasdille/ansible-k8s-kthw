@@ -1,1 +1,1 @@
-playbooks/kubeauthconfig/kube-admin-user.yml
+playbooks/kubernetes-misc/kubeauthconfig/kube-admin-user.yml

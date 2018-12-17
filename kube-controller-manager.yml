@@ -1,1 +1,1 @@
-playbooks/kubeauthconfig/kube-controller-manager.yml
+playbooks/kubernetes-misc/kubeauthconfig/kube-controller-manager.yml

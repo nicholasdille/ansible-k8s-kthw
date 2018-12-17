@@ -1,1 +1,1 @@
-playbooks/kubeauthconfig/kube-scheduler.yml
+playbooks/kubernetes-misc/kubeauthconfig/kube-scheduler.yml
