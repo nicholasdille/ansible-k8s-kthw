@@ -59,17 +59,6 @@
   gather_facts: no
   tasks:
 
-    - name: Create inventory on disk
-      copy:
-        content: |
-          ---
-
-          ansible_host: "{{ ansible_host }}"
-          ansible_user: "{{ ansible_user }}"
-          ansible_ssh_private_key_file: "{{ ansible_ssh_private_key_file }}"
-        dest: "host_vars/{{ inventory_hostname }}"
-      delegate_to: localhost
-
     - name: Create SSH config
       copy:
         content: |
@@ -96,6 +85,9 @@
       debug:
         var: hostvars[inventory_hostname]
         verbosity: 1
+
+    - name: Making sure no other apt-get task is running
+      raw: "while lsof /var/lib/apt/lists/lock || lsof /var/lib/dpkg/lock-frontend; do sleep 5; done"
 
     - name: Install updates
       raw: "apt-get update && apt-get -y upgrade"
