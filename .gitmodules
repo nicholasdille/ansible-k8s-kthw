@@ -1,4 +1,4 @@
 [submodule "playbooks/kubernetes-misc"]
     path = playbooks/kubernetes-misc
     url = https://github.com/githubixx/ansible-kubernetes-playbooks.git
-    branch = tags/v5.0.0_r1.12.3
+    branch = tags/v6.0.0_r1.13.2
