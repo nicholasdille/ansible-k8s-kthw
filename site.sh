@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+git submodule update --init
+
+chmod o-rwx .
+ansible-galaxy install -r requirements.yml
+
 ansible-playbook hcloud.yml
 
 # needs updating for hardening
